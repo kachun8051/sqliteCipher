@@ -1,0 +1,10 @@
+/AutoBackups
+/Objects/b4xlibs
+/Objects/bin
+/Objects/gen
+/Objects/res
+/Objects/shell
+/Objects/src
+/Objects/classes.dex
+/Objects/*.apk
+*.zip

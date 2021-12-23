@@ -1,0 +1,137 @@
+﻿Build1=Default,hk.b4a.examples.sqlcipher.json
+File1=Layout.bal
+File2=Layout1.bal
+File3=Layout2.bal
+File4=test.txt
+FileGroup1=Default Group
+FileGroup2=Default Group
+FileGroup3=Default Group
+FileGroup4=Default Group
+Group=Default Group
+Library1=core
+Library2=json
+Library3=okhttputils2
+Library4=sql
+Library5=sqlcipher
+Library6=xui
+Library7=runtimepermissions
+ManifestCode='This code will be applied to the manifest file during compilation.~\n~'You do not need to modify it in most cases.~\n~'See this link for for more information: https://www.b4x.com/forum/showthread.php?p=78136~\n~AddManifestText(~\n~<uses-sdk android:minSdkVersion="14" android:targetSdkVersion="30"/>~\n~<supports-screens android:largeScreens="true" ~\n~    android:normalScreens="true" ~\n~    android:smallScreens="true" ~\n~    android:anyDensity="true"/>)~\n~SetApplicationAttribute(android:icon, "@drawable/icon")~\n~SetApplicationAttribute(android:label, "$LABEL$")~\n~CreateResourceFromFile(Macro, Themes.LightTheme)~\n~AddPermission("android.permission.WRITE_EXTERNAL_STORAGE")~\n~AddPermission("android.permission.READ_EXTERNAL_STORAGE")~\n~AddPermission(android.permission.INTERNET)~\n~'End of default text.~\n~
+Module1=actSqlite2
+Module2=actSqlite3
+Module3=clsSqlite
+Module4=clsSqlite2
+Module5=clsSqlite3
+Module6=Starter
+NumberOfFiles=4
+NumberOfLibraries=7
+NumberOfModules=6
+Version=11
+@EndOfDesignText@
+#Region  Project Attributes 
+	#ApplicationLabel: B4A SQLite Json
+	#VersionCode: 1
+	#VersionName: 
+	'SupportedOrientations possible values: unspecified, landscape or portrait.
+	#SupportedOrientations: unspecified
+	#CanInstallToExternalStorage: False
+	#BridgeLogger: True
+#End Region
+
+#Region  Activity Attributes 
+	#FullScreen: False
+	#IncludeTitle: True
+#End Region
+
+Sub Process_Globals
+	'These global variables will be declared once when the application starts.
+	'These variables can be accessed from all modules.
+	Private xui As XUI
+	Private objSqlite As clsSqlite
+	Private RP As RuntimePermissions
+End Sub
+
+Sub Globals
+	'These global variables will be redeclared each time the activity is created.
+	Private btnAdd As Button
+	Private btnSelect As Button
+	Private btnUpdate As Button
+	Private btnAnother, btnAnother2 As Button
+End Sub
+
+Sub Activity_Create(FirstTime As Boolean)
+	Activity.LoadLayout("Layout")
+	If objSqlite.IsInitialized = False Then
+		objSqlite.Initialize(Me, "dbHandler")
+	End If	
+	Activity.Title = "Main"
+	copydummyfile
+End Sub
+
+Sub Activity_Resume
+	objSqlite.checkDbExist
+End Sub
+
+Sub Activity_Pause (UserClosed As Boolean)
+
+End Sub
+
+' This function is used to copy dummy file from Assets to Default External folder
+' First, this function make use of RuntimePermissions to ensure have permission to copy file
+' Second, this function make sure the default folder exists
+Private Sub copydummyfile() As Boolean	
+	Try
+		If File.Exists(RP.GetSafeDirDefaultExternal(""), "test.txt") = False And File.Exists(File.DirAssets, "test.txt") = True Then
+			File.Copy(File.DirAssets, "test.txt", RP.GetSafeDirDefaultExternal(""), "test.txt")
+		End If
+		Return True
+	Catch
+		LogColor("copyfile: " & LastException.Message, Colors.Red)
+		Return False
+	End Try	
+End Sub
+
+'Sub Button1_Click
+'	xui.MsgboxAsync("Hello world!", "B4X")
+'End Sub
+
+Private Sub btnUpdate_Click
+	objSqlite.updaterecord("oz", "+123456789")
+End Sub
+
+Private Sub btnSelect_Click
+	objSqlite.selectrecord("+491765")
+End Sub
+
+Private Sub btnAdd_Click
+	objSqlite.insertrecord("oz", _
+		CreateMap("cell": "+491765", "home": "+498973"))
+End Sub
+
+Sub dbHandler(map1 As Map) 'ignore
+	If map1.IsInitialized = False Then
+		Return
+	End If
+	If map1.ContainsKey("issuccess") = False Then
+		ToastMessageShow(map1.Get("errmsg"), True)
+		Return
+	End If
+	Dim task1 As String = map1.Get("task")
+	Select task1
+		Case "checkdb"
+			ToastMessageShow(map1.Get("msg"), False)
+		Case "insertrecord"
+			ToastMessageShow(map1.Get("msg"), False)
+		Case "selectrecord"
+			ToastMessageShow(map1.Get("msg"), False)
+		Case "updaterecord"
+			ToastMessageShow(map1.Get("msg"), False)
+	End Select
+End Sub
+
+Private Sub btnAnother_Click
+	StartActivity(actSqlite2)
+End Sub
+
+Private Sub btnAnother2_Click
+	StartActivity(actSqlite3)
+End Sub
